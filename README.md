@@ -31,3 +31,8 @@ The training data, GRCh38 homo sapiens reference data for building the machine l
 The validation data, human RNA-seq was received from the  Department of Medicine, Institute of Lung Research, Philipps University of Marburg, Germany. This can be made available on request.
 
 ## Running the code
+
+from tensorflow.keras.models import load_model
+Model = load_model ('path/to/RNAIntel.h5')
+Model.summary()
+y_predict =Model.predict(X_data)
