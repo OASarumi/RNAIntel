@@ -6,8 +6,9 @@ Following receiving raw sequence readings from an organism, next is the need to 
 #### Hardware Requirements
 RNAIntels requires a  functional computer system with a minimum of 4g RAM for efficient encoding of the RNA-seq data
 
-
 #### OS Requirements
+RNAIntels meet the software portability requirements. The software is not platform dependent and can run on Windows, Linux and Unix operating systems. The software has been tested on Windows 10 and Unix operating systems
+
 
 ## Dependancies
 
