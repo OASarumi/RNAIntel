@@ -7,3 +7,7 @@ Following receiving raw sequence readings from an organism, next is the need to 
 Hardware Requirements
 
 OS Requirements
+
+# Dependancies
+
+# Data
