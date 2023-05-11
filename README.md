@@ -33,6 +33,9 @@ The validation data, human RNA-seq was received from the  Department of Medicine
 ## Running the code
 
 from tensorflow.keras.models import load_model
+
 Model = load_model ('path/to/RNAIntel.h5')
+
 Model.summary()
+
 y_predict =Model.predict(X_data)
