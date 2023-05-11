@@ -14,7 +14,7 @@ RNAIntels meet the software portability requirements. The software is not platfo
 The code is written in Python 3.9.16 and tested on Unix with the following libraries installed:
 
 Library | Version
---- | --- | ---
+--- | --- 
 tensorflow | 1.2
 biopython | 2.1
 math | 2.1
@@ -24,11 +24,11 @@ numpy | 2.1
 plotly | 2.1
 sklearn| 2.1
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+| Library       | Version       | 
+| ------------- |:-------------:| 
+| tensorflow    | right-aligned | 
+| col 2 is      | centered      | 
+| zebra stripes | are neat      | 
 
 
 
