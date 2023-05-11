@@ -10,7 +10,7 @@ RNAIntels requires a  functional computer system with a minimum of 4g RAM for ef
 RNAIntels meet the software portability requirements. The software is not platform dependent and can run on Windows, Linux and Unix operating systems. The software has been tested on Windows 10 and Unix operating systems
 
 
-## Dependancies
+## Dependencies
 The code is written in Python 3.9.16 and tested on Unix OS with the following libraries installed:
 
 Library | Version
