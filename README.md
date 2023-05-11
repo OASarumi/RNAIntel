@@ -1,2 +1,2 @@
 # RNAIntels
-Machine learning-based tool for discovering of coding and non coding small RNAs in human RNA-seq data
+Machine learning-based tool for discovering coding and non coding small RNAs in human RNA-seq data
