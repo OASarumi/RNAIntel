@@ -24,13 +24,6 @@ numpy | 2.1
 plotly | 2.1
 sklearn| 2.1
 
-| Library       | Version       | 
-| ------------- |:-------------:| 
-| tensorflow    | right-aligned | 
-| col 2 is      | centered      | 
-| zebra stripes | are neat      | 
-
-
 
 ## Data
 The training data, GRCh38 homo sapiens reference data for building the machine learning model, was retrieved from the ENSEMBL database (www.ensembl.org). The raw dataset contained 207,877 instances of protein-coding sequences and 63,865 instances of non-protein coding sequences. We observed that the raw data was inundated with instances of pseudogenes and overlapping sequences. After cleaning the raw data, we obtained a total of 69,420 protein-coding sequences and 28,225 non-coding sequences.  The cleaned data can be located at Data/cleaned training data.
