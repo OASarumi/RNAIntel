@@ -12,6 +12,7 @@ RNAIntels meet the software portability requirements. The software is not platfo
 
 ## Dependancies
 The code is written in Python 3.9.16 and tested on Unix with the following libraries installed:
+
 Library | Version
 --- | --- | ---
 tensorflow | 1.2
