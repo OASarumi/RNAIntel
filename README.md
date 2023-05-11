@@ -13,4 +13,7 @@ RNAIntels meet the software portability requirements. The software is not platfo
 ## Dependancies
 
 ## Data
+The training data, GRCh38 homo sapiens reference data for building the machine learning model, was retrieved from the ENSEMBL database (www.ensembl.org). The raw dataset contained 207,877 instances of protein-coding sequences and 63,865 instances of non-protein coding sequences. We observed that the raw data was inundated with instances of pseudogenes and overlapping sequences. After cleaning the raw data, we obtained a total of 69,420 protein-coding sequences and 28,225 non-coding sequences.  The cleaned data can be located at Data/cleaned training data.
+The human RNA-seq validation data  was received from the  Department of Medicine, Institute of Lung Research, Philipps University of Marburg, Germany. This can be made available on request
+
 ## Running the code
