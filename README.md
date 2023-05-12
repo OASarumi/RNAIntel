@@ -15,14 +15,14 @@ The code is written in Python 3.9.16 and tested on Unix OS with the following li
 
 Library | Version
 --- | --- 
-tensorflow | 1.2
-biopython | 2.1
-math | 2.1
-pandas | 2.1
-matplotlib | 2.1
-numpy | 2.1
-plotly | 2.1
-sklearn| 2.1
+tensorflow | 2.10.0
+biopython | 1.78
+pandas | 1.53
+matplotlib | 3.7.1
+numpy | 1.23.5
+scikit-learn| 1.2.2
+Keras | 2.10.0
+plotly | 5.9.0
 
 
 ## Data
