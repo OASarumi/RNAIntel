@@ -21,7 +21,7 @@ pandas | 1.53
 matplotlib | 3.7.1
 numpy | 1.23.5
 scikit-learn| 1.2.2
-Keras | 2.10.0
+keras | 2.10.0
 plotly | 5.9.0
 
 
