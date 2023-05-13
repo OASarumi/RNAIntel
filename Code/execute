@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from Bio import SeqIO
 #Loading the Coding RNA dataset 
-with open('HomoCD_Discrete.fa') as fasta_file:
+with open('/path_to/coding.fasta') as fasta_file:
     identifiers=[]
     lengths=[]
     name=[]
@@ -20,7 +20,7 @@ coding['class']=coding.apply(lambda x:1, axis=1)
 coding_df=coding[coding['Len'].between(30,60)]
 coding_df.drop('Name',axis='columns',inplace=True)
 #Loading the non-coding RNA dataset
-with open('HomoNCD_Discrete.fa') as fasta_file:
+with open('/path_to/non-coding.fasta') as fasta_file:
     identifiers=[]
     lengths=[]
     name=[]
@@ -186,9 +186,6 @@ from plotly.subplots import make_subplots
 
 
 conf_matrix = confusion_matrix(y_test, y_pred)
-
-
-
 fig = make_subplots(1,2, 
                     subplot_titles=(f'ROC Curve (AUC={auc(fpr, tpr):.4f})', 
                     'Confusion Matrix'))
