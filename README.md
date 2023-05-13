@@ -39,4 +39,4 @@ You can execute RNAIntels by running the following codes in python enviroment. T
 
 `Model.summary()`
 
-`y_predict =Model.predict(X_data)`
+`y_predict =Model.predict(X_test)`
