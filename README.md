@@ -40,5 +40,4 @@ model.summary()
 data = load_data('path/to/fasta')
 # y_predict = model.predict(X_test)
 predictions = model.predict(data)
-# Something like that
 ```
