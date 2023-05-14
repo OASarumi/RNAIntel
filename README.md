@@ -38,6 +38,5 @@ from tensorflow.keras.models import load_model
 model = load_model('path/to/RNAIntel.h5')
 model.summary()
 data = load_data('path/to/fasta')
-# y_predict = model.predict(X_test)
 predictions = model.predict(data)
 ```
