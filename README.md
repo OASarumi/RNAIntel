@@ -31,7 +31,7 @@ The training data, GRCh38 homo sapiens reference data for building the machine l
 The validation data, human RNA-seq was received from the Institute for Lung Research, Universities of Giessen. This can be made available on request.
 
 ## Execution
-You can execute RNAIntels by running the following codes in python enviroment. The executable file is saved as h5 format, and can be downloaded from [/code/RNAIntels.h5 ](https://github.com/OASarumi/RNAIntels/tree/main/Code/RNAIntels.h5)
+You can execute RNAIntels by running the following codes in python enviroment. The executable file is saved as h5 format, and can be downloaded from [code/RNAIntels.h5 ](https://github.com/OASarumi/RNAIntels/tree/main/Code/RNAIntels.h5)
 
 ```python
 from tensorflow.keras.models import load_model
