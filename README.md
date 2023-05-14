@@ -40,3 +40,5 @@ model.summary()
 data = load_data('path/to/fasta')
 predictions = model.predict(data)
 ```
+## License
+This software is lincensed under the MIT license
