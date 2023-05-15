@@ -1,14 +1,5 @@
 from tensorflow.keras.models import load_model
-
-Model = load_model ('path/to/RNAIntel.h5')
-
-Model.summary()`
-
-y_pred_proba = Model.predict(X_test)
-
-fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
-
-y_pred = (y_pred_proba > 0.5).astype(int)
-
-y_predict =Model.predict(X_test)`
-
+model = load_model('path/to/RNAIntel.h5')
+model.summary()
+data = load_data('path/to/fasta')
+predictions = model.predict(data)
