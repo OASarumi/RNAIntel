@@ -28,8 +28,7 @@ plotly | 5.9.0
 ## Data
 The training data, GRCh38 homo sapiens reference data for building the machine learning model, was retrieved from the ENSEMBL database (www.ensembl.org). The raw dataset contained 207,877 instances of protein-coding sequences and 63,865 instances of non-protein coding sequences. We observed that the raw data was inundated with instances of pseudogenes and overlapping sequences. After cleaning the raw data, we obtained a total of 69,420 protein-coding sequences and 28,225 non-coding sequences. We created a balanced dataset ( lenght <= 60 ) from the cleaned data  as training data for the machine learning operations. The cleaned dataset can be downloaded from  [Data/Cleaned_data](https://github.com/OASarumi/RNAIntels/tree/main/Data/Cleaned_dataset)
 
-The validation data, human RNA-seq was received from the Institute for Lung Research, Universities of Giessen. This can be made available on request.
-
+The validation data, human RNA-seq was received from the Institute for Lung Research, Universities of Giessen. 
 ## Execution
 You can execute RNAIntels by running the following codes in python enviroment. The executable file is saved as h5 format, and can be downloaded from [code/RNAIntels.h5 ](https://github.com/OASarumi/RNAIntels/tree/main/Code/RNAIntels.h5)
 
