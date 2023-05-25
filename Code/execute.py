@@ -42,16 +42,14 @@ df_sequence = pd.concat(df_All)
 p = re.compile(r'[^ACGT]')
 df_sequence['sequence'] = df_sequence['sequence'].map(lambda x: x.replace('N', ''))
 
-### Using FCGR encoding for the sequence
+### FCGR encoding for DNA sequences by Sandra Clemens
 from math import sin, cos, pi, floor, ceil
 BASES = {
 "digits": [0,1,2,3,4,5,6,7,8,9],
 "AMINO": ["A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y"],
 "amino": ["a","c","d","e","f","g","h","i","k","l","m","n","p","q","r","s","t","v","w","y"],
 "DNA": ["A","G","T","C"],
-"dna": ["a","g","t","c"],
-"LETTERS": ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
-"letters":["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+"dna": ["a","g","t","c"]
 }
 
 class CGR:
@@ -178,55 +176,7 @@ print('Sensitivity: %f' % sensitivity)
 matthews_corrcoef =  matthews_corrcoef(y_test, y_pred)
 print(' MCC: %f' % matthews_corrcoef)
 
-from sklearn import metrics
-from sklearn.metrics import roc_curve, confusion_matrix, auc
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 
-conf_matrix = confusion_matrix(y_test, y_pred)
-fig = make_subplots(1,2, 
-                    subplot_titles=(f'ROC Curve (AUC={auc(fpr, tpr):.4f})', 
-                    'Confusion Matrix'))
-                    #, column_widths=[0.7,0.3])
-
-fig.add_trace(go.Scatter(
-    x=fpr, y=tpr,
-    fill = 'tozeroy',
-    ), row=1, col=1)
-
-fig.update_xaxes(title_text="False Positive Rate", row=1, col=1)
-fig.update_yaxes(title_text="True Positive Rate", row=1, col=1)
-
-fig.add_shape(
-    type='line', line=dict(dash='dash'),
-    x0=0, x1=1, y0=0, y1=1)
-
-fig.update_yaxes(scaleanchor="x", scaleratio=1)#, row=1, col=1)
-fig.update_xaxes(constrain='domain')#, row=1, col=2)
-
-
-fig.add_trace(go.Heatmap(
-                    z=conf_matrix,
-                    x = ['1','0'],
-                    y = ['1','0'],
-                    text = [list(conf_matrix.astype('str')[0,:]), 
-                            list(conf_matrix.astype('str')[1,:])],
-                    texttemplate="%{text}",
-                    textfont={"size":20},
-                    hoverongaps=False),
-                    row=1,col=2)
-fig.update_yaxes(autorange="reversed", row=1, col=2)
-
-#fig.update_yaxes(scaleanchor="x", scaleratio=1, row=1, col=2)
-#fig.update_xaxes(constrain='domain', row=1, col=2)
-
-fig.update_layout(
-    autosize=False,
-    width=800,
-    height=400,)
-
-fig.show()
 
    
