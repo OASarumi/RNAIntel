@@ -42,7 +42,7 @@ df_sequence = pd.concat(df_All)
 p = re.compile(r'[^ACGT]')
 df_sequence['sequence'] = df_sequence['sequence'].map(lambda x: x.replace('N', ''))
 
-### FCGR encoding for DNA sequences by Sandra Clemens
+# This FCGR is a variant version of the R package kaos by Dominic Eger and Hannah Franziska Löchel, implemented in Python by Sandra Clemens
 from math import sin, cos, pi, floor, ceil
 BASES = {
 "digits": [0,1,2,3,4,5,6,7,8,9],
@@ -126,7 +126,6 @@ class CGR:
         
         return corners
         
-#Generating the FCGR encodings of the sequences
 eval_sequence = df_sequence.iloc[:, 0].values
 J = []
 for x in eval_sequence:
