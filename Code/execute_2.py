@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from multiprocessing import Semaphore, Manager, Process
-from tensorflow.keras.models import load_model
+#from tensorflow.keras.models import load_model
 from math import sin, cos, pi, floor, ceil
 from Bio import SeqIO
 
@@ -91,11 +91,19 @@ class RNAIntels():
         self._fasta = args.filepath
         self._threads = args.threads
 
-        self._model = load_model('RNAIntels.h5/RNAIntel.h5')
+        #self._model = load_model('RNAIntels.h5/RNAIntel.h5')
         data = self._read_fasta(self._fasta)
-        identifiers, coded_data = self._encode_data(data) # multi-threading
+        
+
+        #identifiers, coded_data = self._encode_data(data) # multi-threading
+        self._manage_encoding(data)
+
+        exit(10)
+
         del data
-        results = self._manage_prediction(identifiers, coded_data) # multi-threading
+        results = self._classify_sequences(identifiers, coded_data)
+        print(results)
+        #results = self._manage_prediction(identifiers, coded_data) # multi-threading
 
     def _read_fasta(self, filepath: str, min: int = 30, max: int = 60) -> object:
         sequences: list = []
@@ -117,12 +125,71 @@ class RNAIntels():
 
         return coding_df
 
+    @staticmethod
+    def _get_split_ranges(total_len: int, divider: int):
+        chunk_size: int = ceil(total_len/divider)
+        counter: int = 0
+        ranges: list = []
+        while counter <= total_len:
+            tmp: int = counter
+            counter += chunk_size
+            ranges.append([tmp, counter])
+
+        if ranges[-1][1] > total_len:
+            ranges[-1][1] = total_len
+
+        return ranges
+
+    def _manage_encoding(self, data: pd.DataFrame):
+        data['sequence'] = data['sequence'].map(lambda x: x.replace('N', ''))
+
+        if self._threads > 1:
+            print("Multi-Thread mode")
+            ranges = self._get_split_ranges(len(data), self._threads)
+
+            collection = Manager().list()
+            sema = Semaphore(self._threads)
+            
+            jobs = []
+            for i in range(0, len(ranges)):
+                seqs = data["sequence"][range(ranges[i][0], ranges[i][1])].values
+                ids = data["id"][range(ranges[i][0], ranges[i][1])].values
+                p = Process(target=self._encoding_mt, args=(seqs, ids, sema, collection))
+                jobs.append(p)
+                p.start()
+            for proc in jobs:
+                proc.join()
+
+            encoded_data = collection
+
+        else:
+            print("Single-Thread mode")
+
+            encoded_data = self._encoding_st(data["sequence"], data["id"])
+
+
+
+    def _encoding_st(self, seqs: list, ids: list):
+        results: list = []
+        for i in range(0, len(seqs)):
+            fcgr = CGR(data=seqs[i], seq_base=["A","G","T","C"]).calc_fcgr(res=8)
+            results.append((ids[i], fcgr))
+        return results
+
+    def _encoding_mt(self, seqs: list, ids: list, sema: Semaphore, collection):
+        sema.acquire()
+
+        for i in range(0, len(seqs)):
+            fcgr = CGR(data=seqs[i], seq_base=["A","G","T","C"]).calc_fcgr(res=8)
+            collection.append((ids[i], fcgr))
+
+        sema.release()
+        return True
+
     def _encode_data(self, data: pd.DataFrame):
         # kick-out unknown nucleotids
         data['sequence'] = data['sequence'].map(lambda x: x.replace('N', ''))
         sequences = data.iloc[:, 0].values
-
-
 
         # multi-threading location
         coded_data: list = []
@@ -161,36 +228,19 @@ class RNAIntels():
         return collection
 
 
-    def _classify_sequences(self, id_chunk: list, seq_chunk: list, sema):
-        sema.acquire()
-
-        if len(id_chunk) != len(seq_chunk):
+    def _classify_sequences(self, ids: list, seqs: list):
+        if len(ids) != len(seqs):
             print("Not equal numbers of sequences and identifiers. Aborting")
-            sema.release()
             exit(3)
 
-        print("started chunks")
-
-        print(len(id_chunk))
-        print(len(seq_chunk))
-
-        pred_probability = self._model.predict(np.array(seq_chunk))
-
-        print(pred_probability)
-
+        pred_probability = self._model.predict(np.array(seqs))
         predictions = np.squeeze((pred_probability > 0.5).astype(int))
-
-        print(predictions)
 
         results: list = []
         for iterator in range(0, len(predictions)):
-            results.append((predictions[iterator], id_chunk[iterator]))
+            results.append((predictions[iterator], ids[iterator]))
 
-        print(results)
-
-        sema.release()
-        return True
-
+        return results
 
     @staticmethod
     def chunks(lst, n):
