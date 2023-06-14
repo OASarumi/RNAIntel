@@ -3,8 +3,8 @@ import argparse
 import os
 import numpy as np
 import pandas as pd
-import multiprocessing
 
+from multiprocessing import Semaphore, Manager, Process
 from tensorflow.keras.models import load_model
 from math import sin, cos, pi, floor, ceil
 from Bio import SeqIO
@@ -91,12 +91,11 @@ class RNAIntels():
         self._fasta = args.filepath
         self._threads = args.threads
 
-        model = load_model('RNAIntels.h5/RNAIntel.h5')
+        self._model = load_model('RNAIntels.h5/RNAIntel.h5')
         data = self._read_fasta(self._fasta)
-        coded_data = self._encode_data(data) # multi-threading
-        results = self._classify_sequences(coded_data, model) # multi-threading
-
-        print(results)
+        identifiers, coded_data = self._encode_data(data) # multi-threading
+        del data
+        results = self._manage_prediction(identifiers, coded_data) # multi-threading
 
     def _read_fasta(self, filepath: str, min: int = 30, max: int = 60) -> object:
         sequences: list = []
@@ -106,18 +105,15 @@ class RNAIntels():
 
         with open(filepath) as fasta_file:
 
-            for seq_record in SeqIO.parse(fasta_file,'fasta'):
+            for seq_record in SeqIO.parse(fasta_file, 'fasta'):
                 sequences.append(str(seq_record.seq))
                 lengths.append(len(seq_record.seq))
                 name.append(seq_record.id)
                 
-            dataframe = {'sequence':sequences,'len':lengths,'id':name}
-            coding = pd.DataFrame(dataframe)
+            coding = pd.DataFrame({'sequence':sequences,'len':lengths,'id':name})
 
         # drop off sequences which are too long and to short
-        coding['class'] = coding.apply(lambda x:1, axis=1)
         coding_df = coding[coding['len'].between(min, max)]
-        coding_df.drop('id', axis='columns' ,inplace=True)
 
         return coding_df
 
@@ -126,19 +122,74 @@ class RNAIntels():
         data['sequence'] = data['sequence'].map(lambda x: x.replace('N', ''))
         sequences = data.iloc[:, 0].values
 
+
+
         # multi-threading location
-        coded_data = []
+        coded_data: list = []
+        identifiers: list = []
+        counter: int = 0
         for x in sequences:
             cgr = CGR(data=x, seq_base=["A","G","T","C"])
-            fcgr_seq = cgr.calc_fcgr(res=8)
-            seq = fcgr_seq
-            coded_data.append(seq)
-        return coded_data
+            fcgr_matrix = cgr.calc_fcgr(res=8)
+            coded_data.append(fcgr_matrix)
+            identifiers.append(data['id'][counter])
+            counter += 1
 
-    def _classify_sequences(self, coded_data, model):
-        pred_proba = model.predict(coded_data)
-        prediction = (pred_proba > 0.5).astype(int)
-        return prediction
+        return identifiers, coded_data
+
+    def _manage_prediction(self, identifiers: list, coded_data: list):
+
+        chunk_size: int = ceil(len(coded_data)/self._threads)
+        seq_chunks: list = list(self.chunks(coded_data, chunk_size))
+        id_chunks: list = list(self.chunks(identifiers, chunk_size))
+
+        self._classify_sequences(id_chunks[0], seq_chunks[0])
+
+        #return_dict = Manager().dict()
+        #sema = Semaphore(self._threads)
+        
+        #sublist = self.chunks(coded_data, 256)
+        #print(sublist)
+        #for sub in sublist:
+        #    jobs = []
+        #    for i in sub:
+        #        p = Process(target=self._classify_sequences, args=(i, sema, return_dict))
+        #        jobs.append(p)
+        #        p.start()
+        #    for proc in jobs:
+        #        proc.join()
+        #print(return_dict)
+
+
+    def _classify_sequences(self, id_chunk: list, seq_chunk: list):
+        if len(id_chunk) != len(seq_chunk):
+            print("Not equal numbers of sequences and identifiers. Aborting")
+            exit(3)
+
+        pred_probability = self._model.predict(np.array(seq_chunk))
+        predictions = np.squeeze((pred_probability > 0.5).astype(int))
+
+        results: list = []
+        for iterator in range(0, len(predictions)):
+            results.append((predictions[iterator], id_chunk[iterator]))
+
+        return results
+
+        #sema.acquire()
+
+        #pred_proba = self._model.predict(np.ndarray(sequence))
+        #prediction = (pred_proba > 0.5).astype(int)
+
+        #print(prediction)
+        #sema.release()
+        #return prediction
+
+
+    @staticmethod
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
 
 
 def main():
