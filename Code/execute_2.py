@@ -143,46 +143,53 @@ class RNAIntels():
         seq_chunks: list = list(self.chunks(coded_data, chunk_size))
         id_chunks: list = list(self.chunks(identifiers, chunk_size))
 
-        self._classify_sequences(id_chunks[0], seq_chunks[0])
+        print(len(seq_chunks))
 
-        #return_dict = Manager().dict()
-        #sema = Semaphore(self._threads)
+        #self._classify_sequences(id_chunks[0], seq_chunks[0])
+
+        collection = Manager().list()
+        sema = Semaphore(self._threads)
         
-        #sublist = self.chunks(coded_data, 256)
-        #print(sublist)
-        #for sub in sublist:
-        #    jobs = []
-        #    for i in sub:
-        #        p = Process(target=self._classify_sequences, args=(i, sema, return_dict))
-        #        jobs.append(p)
-        #        p.start()
-        #    for proc in jobs:
-        #        proc.join()
-        #print(return_dict)
+        jobs = []
+        for i in range(0, len(seq_chunks)):
+            p = Process(target=self._classify_sequences, args=(id_chunks[i], seq_chunks[i], sema))
+            jobs.append(p)
+            p.start()
+        for proc in jobs:
+            proc.join()
+
+        return collection
 
 
-    def _classify_sequences(self, id_chunk: list, seq_chunk: list):
+    def _classify_sequences(self, id_chunk: list, seq_chunk: list, sema):
+        sema.acquire()
+
         if len(id_chunk) != len(seq_chunk):
             print("Not equal numbers of sequences and identifiers. Aborting")
+            sema.release()
             exit(3)
 
+        print("started chunks")
+
+        print(len(id_chunk))
+        print(len(seq_chunk))
+
         pred_probability = self._model.predict(np.array(seq_chunk))
+
+        print(pred_probability)
+
         predictions = np.squeeze((pred_probability > 0.5).astype(int))
+
+        print(predictions)
 
         results: list = []
         for iterator in range(0, len(predictions)):
             results.append((predictions[iterator], id_chunk[iterator]))
 
-        return results
+        print(results)
 
-        #sema.acquire()
-
-        #pred_proba = self._model.predict(np.ndarray(sequence))
-        #prediction = (pred_proba > 0.5).astype(int)
-
-        #print(prediction)
-        #sema.release()
-        #return prediction
+        sema.release()
+        return True
 
 
     @staticmethod
