@@ -90,10 +90,11 @@ class RNAIntels():
     def __init__(self, args):
         self._fasta = args.filepath
         self._threads = args.threads
+        self._verbose = args.verbose
 
         #self._model = load_model('RNAIntels.h5/RNAIntel.h5')
         data = self._read_fasta(self._fasta)
-        
+        print(data)
 
         #identifiers, coded_data = self._encode_data(data) # multi-threading
         self._manage_encoding(data)
@@ -115,15 +116,15 @@ class RNAIntels():
 
             for seq_record in SeqIO.parse(fasta_file, 'fasta'):
                 sequences.append(str(seq_record.seq))
-                lengths.append(len(seq_record.seq))
                 name.append(seq_record.id)
                 
-            coding = pd.DataFrame({'sequence':sequences,'len':lengths,'id':name})
+            data = pd.DataFrame({'sequence':sequences, 'id':name})
 
         # drop off sequences which are too long and to short
-        coding_df = coding[coding['len'].between(min, max)]
+        between_filter = lambda x: len(x) >= min and len(x) <= max
+        data: pd.DataFrame = data.loc[data['sequence'].apply(between_filter)]
 
-        return coding_df
+        return data.reset_index(drop=True)
 
     @staticmethod
     def _get_split_ranges(total_len: int, divider: int):
@@ -144,7 +145,8 @@ class RNAIntels():
         data['sequence'] = data['sequence'].map(lambda x: x.replace('N', ''))
 
         if self._threads > 1:
-            print("Multi-Thread mode")
+            if self._verbose >= 1:
+                print("# Multi-threaded mode")
             ranges = self._get_split_ranges(len(data), self._threads)
 
             collection = Manager().list()
@@ -152,37 +154,42 @@ class RNAIntels():
             
             jobs = []
             for i in range(0, len(ranges)):
+
                 seqs = data["sequence"][range(ranges[i][0], ranges[i][1])].values
                 ids = data["id"][range(ranges[i][0], ranges[i][1])].values
+
                 p = Process(target=self._encoding_mt, args=(seqs, ids, sema, collection))
                 jobs.append(p)
                 p.start()
             for proc in jobs:
                 proc.join()
-
             encoded_data = collection
-
         else:
-            print("Single-Thread mode")
-
+            if self._verbose >= 1:
+                print("# Single-threaded mode")
             encoded_data = self._encoding_st(data["sequence"], data["id"])
-
-
+        #print(encoded_data)
 
     def _encoding_st(self, seqs: list, ids: list):
         results: list = []
+
         for i in range(0, len(seqs)):
-            fcgr = CGR(data=seqs[i], seq_base=["A","G","T","C"]).calc_fcgr(res=8)
-            results.append((ids[i], fcgr))
+            try:
+                fcgr = CGR(data=seqs[i], seq_base=["A","G","T","C"]).calc_fcgr(res=8)
+                results.append((ids[i], fcgr))
+            except:
+                continue
         return results
 
     def _encoding_mt(self, seqs: list, ids: list, sema: Semaphore, collection):
         sema.acquire()
 
         for i in range(0, len(seqs)):
-            fcgr = CGR(data=seqs[i], seq_base=["A","G","T","C"]).calc_fcgr(res=8)
-            collection.append((ids[i], fcgr))
-
+            try:
+                fcgr = CGR(data=seqs[i], seq_base=["A","G","T","C"]).calc_fcgr(res=8)
+                collection.append((ids[i], fcgr))
+            except:
+                continue
         sema.release()
         return True
 
@@ -248,14 +255,13 @@ class RNAIntels():
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
-
 def main():
     parser = argparse.ArgumentParser(
                     prog='RNAIntels',
                     description='Classify RNA sequences into coding and noncoding',
                     epilog='Please cite us')
     parser.add_argument('filepath', type=str)
-    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument('-t', '--threads', type=int, default=1)
     args = parser.parse_args()
     RNAIntels(args)
