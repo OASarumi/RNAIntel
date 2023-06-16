@@ -24,20 +24,30 @@ keras | >=2.10.0
 plotly | >=5.9.0
 multiprocessing | >=2.6.2.1
 
+### Installing all dependencies
+```bash
+pip install tensorflow biopython pandas matplotlib numpy scikit-learn plotly multiprocessing
+```
 
 ## Data
 The training data, GRCh38 homo sapiens reference data for building the machine learning model, was retrieved from the ENSEMBL database (www.ensembl.org). The raw dataset contained 207,877 instances of protein-coding sequences and 63,865 instances of non-protein coding sequences. We observed that the raw data was inundated with instances of pseudogenes and overlapping sequences. After cleaning the raw data, we obtained a total of 69,420 protein-coding sequences and 28,225 non-coding sequences. We created a balanced dataset ( lenght <= 60 ) from the cleaned data  as training data for the machine learning operations. 
 
 The validation data, human RNA-seq was received from the Institute for Lung Research, Universities of Giessen. 
 ## Execution
-You can execute RNAIntels by running the following codes in python enviroment. The executable file is saved as h5 format, and can be downloaded from [code/RNAIntels.h5 ](https://github.com/OASarumi/RNAIntels/tree/main/Code/RNAIntels.h5)
+You can execute RNAIntels by running the following codes in python enviroment. The executable file is saved as h5 format, and can be downloaded from [code/RNAIntels.h5 ](https://github.com/OASarumi/RNAIntels/tree/main/Code/RNAIntelsModel.h5)
 
-```python
-from tensorflow.keras.models import load_model
-model = load_model('path/to/RNAIntel.h5')
-model.summary()
-data = load_data('path/to/fasta')
-predictions = model.predict(data)
+```bash
+git clone --depth 1 https://github.com/OASarumi/RNAIntels.git
+cd RNAIntels
+
+# -t determines the number of used cores
+./Code/RNAIntels.py /path/to/file.fasta -t 16
 ```
+
+RNAIntels reads currently only FASTA sequences. You can convert a FASTQ file to FASTA with
+```bash
+cat RNASeq.fastq | sed -n --expression='1~4s/^@/>/p;2~4p' > RNASeq.fasta
+```
+
 ## License
 This software is lincensed under the [MIT license](https://github.com/OASarumi/RNAIntels/blob/main/LICENSE)
