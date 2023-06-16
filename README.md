@@ -7,22 +7,22 @@ Following receiving raw sequence readings from an organism, next is the need to 
 RNAIntels requires a  functional computer system with a minimum of 4g RAM for efficient encoding of the RNA-seq data.
 
 #### OS Requirements
-RNAIntels meet the software portability requirements. The software is not platform dependent and can run on Windows, Linux and Unix operating systems. The software has been tested on Windows 10 and Unix operating systems
-
+RNAIntels meet the software portability requirements. The software is not platform dependent and can run on Windows, Linux and MacOs operating systems.
 
 ## Dependencies
-The code is written in Python 3.9.16 and tested on Unix OS with the following libraries installed:
+The code is written in Python 3.9.16 and tested on MacOs and Ubuntu 22.04 with the following libraries installed:
 
 Library | Version
 --- | --- 
-tensorflow | 2.10.0
-biopython | 1.78
-pandas | 1.53
-matplotlib | 3.7.1
-numpy | 1.23.5
-scikit-learn| 1.2.2
-keras | 2.10.0
-plotly | 5.9.0
+tensorflow | >=2.10.0
+biopython | >=1.78
+pandas | >=1.53
+matplotlib | >=3.7.1
+numpy | >=1.23.5
+scikit-learn| >=1.2.2
+keras | >=2.10.0
+plotly | >=5.9.0
+multiprocessing | >=2.6.2.1
 
 
 ## Data
