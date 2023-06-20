@@ -2,23 +2,25 @@ import os
 import numpy as np
 import pandas as pd
 import time
+import gzip
 
 from .cgr import CGR
 from multiprocessing import Semaphore, Manager, Process
 from Bio import SeqIO
 from math import ceil
 
+
 class RNAIntels():
 
     def __init__(self, args):
-        self._fasta = args.filepath
+        self._seq_file = args.sequence_file
         self._threads = args.threads
         self._verbose = args.verbose
         self._model_path = args.model
         self._start_time = time.time()
 
-        # read raw fasta data
-        data = self._read_fasta(self._fasta)
+        # read sequence file
+        data = self._read(self._seq_file, args.min, args.max)
 
         # overwrite original data with matrices
         data = self._manage_encoding(data)
@@ -29,17 +31,36 @@ class RNAIntels():
         # format results output
         self._print_results(results)
 
-        #results = self._manage_prediction(identifiers, coded_data) # multi-threading
+        if self._verbose >= 1:
+            print("# Finished (%d s)" % (time.time()-self._start_time))
 
-    def _read_fasta(self, filepath: str, min: int = 30, max: int = 60) -> object:
+    def _read(self, filepath: str, min: int = 30, max: int = 60) -> pd.DataFrame:
         sequences: list = []
         lengths: list = []
         name: list = []
         coding: object = pd.DataFrame()
 
-        with open(filepath) as fasta_file:
+        # Check whetever file is gzip compressed or not
+        if filepath[-5:len(filepath)].lower() == ".gzip" or filepath[-3:len(filepath)].lower() == ".gz":
+            if self._verbose >= 1:
+                print("## GZIP compression assumed")
+            handler = gzip.open(filepath, "rt")
+            remaining_name = filepath[0:-5] if filepath[-5:len(filepath)] == ".gzip" else filepath[0:-3]
+        else:
+            handler = open(filepath, "r")
+            remaining_name = filepath
 
-            for seq_record in SeqIO.parse(fasta_file, 'fasta'):
+        # Check for FASTA/FASTQ
+        if remaining_name[-6:len(remaining_name)].lower() == ".fastq":
+            if self._verbose >= 1:
+                print("## Detect FASTQ file")
+            sequence_type = "fastq"
+        else:
+            sequence_type = "fasta"
+
+        with handler as sequence_file:
+
+            for seq_record in SeqIO.parse(sequence_file, sequence_type):
                 sequences.append(str(seq_record.seq))
                 name.append(seq_record.id)
                 
