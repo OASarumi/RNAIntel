@@ -40,6 +40,9 @@ class RNAIntels():
         name: list = []
         coding: object = pd.DataFrame()
 
+        if self._verbose >= 1:
+            print("# Reading sequence file")
+
         # Check whetever file is gzip compressed or not
         if filepath[-5:len(filepath)].lower() == ".gzip" or filepath[-3:len(filepath)].lower() == ".gz":
             if self._verbose >= 1:
