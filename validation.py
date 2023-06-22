@@ -3,8 +3,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from Bio import SeqIO
+
 #Loading the Coding RNA dataset 
-with open('/path_to/coding.fasta') as fasta_file:
+with open('data/validation_coding_red.txt') as fasta_file:
     identifiers=[]
     lengths=[]
     name=[]
@@ -20,7 +21,7 @@ coding['class']=coding.apply(lambda x:1, axis=1)
 coding_df=coding[coding['Len'].between(30,60)]
 coding_df.drop('Name',axis='columns',inplace=True)
 #Loading the non-coding RNA dataset
-with open('/path_to/non-coding.fasta') as fasta_file:
+with open('data/validation_noncoding_red.txt') as fasta_file:
     identifiers=[]
     lengths=[]
     name=[]
@@ -29,7 +30,7 @@ with open('/path_to/non-coding.fasta') as fasta_file:
         lengths.append(len(seq_record.seq))
         name.append(seq_record.id)
  
- d={'sequence':identifiers,'Len':lengths,'Name':name}
+    d={'sequence':identifiers,'Len':lengths,'Name':name}
 nocoding=pd.DataFrame(d)
 nocoding['class']=coding.apply(lambda x:0, axis=1) 
 nocoding_df=nocoding[nocoding['Len'].between(28, 60)] 
@@ -140,21 +141,15 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(eval_seq, eval_labels,test_size = 0.25, random_state=45)
 
 from tensorflow.keras.models import load_model
-cnnModel = load_model ('RNAIntel.h5')
+from sklearn.datasets import make_circles
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, matthews_corrcoef, roc_curve
+
+cnnModel = load_model ('RNAIntelsModel.h5')
 cnnModel.summary()
 
 y_pred_proba = cnnModel.predict(X_test)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 y_pred = (y_pred_proba > 0.5).astype(int)
-
-from sklearn.datasets import make_circles
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import f1_score
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import matthews_corrcoef
 
 accuracy = accuracy_score(y_test, y_pred)
 print('Accuracy: %f' % accuracy)
