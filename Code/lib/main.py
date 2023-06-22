@@ -34,7 +34,7 @@ class RNAIntels():
         if self._verbose >= 1:
             print("# Finished (%d s)" % (time.time()-self._start_time))
 
-    def _read(self, filepath: str, min: int = 30, max: int = 60) -> pd.DataFrame:
+    def _read(self, filepath: str, min: int = 25, max: int = 60) -> pd.DataFrame:
         sequences: list = []
         lengths: list = []
         name: list = []
@@ -167,7 +167,9 @@ class RNAIntels():
         return identifiers, coded_data
 
     def _classify_sequences(self, data: list):
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
         from tensorflow.keras.models import load_model
+
 
         if self._model_path is not None:
             model = load_model(self._model_path)
