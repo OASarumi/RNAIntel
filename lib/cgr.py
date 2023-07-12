@@ -8,7 +8,7 @@ class CGR:
     r = 1
 
     #preciion 8 = f8 = 64 bit float
-    def __init__(self, data, precision='8', seq_base =None):
+    def __init__(self, data, precision='8'):
         self.data = data
         self.dtype = f"f{precision}"
         self.seq_base=["G","T","C","A"]
